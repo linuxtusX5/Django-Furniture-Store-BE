@@ -28,6 +28,27 @@ class ProductListSerializer(serializers.ModelSerializer):
     def get_reviews_count(self, obj):
         return obj.reviews.count()
 
+class ProductDetailSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    category_id = serializers.IntegerField(write_only=True)
+    average_rating = serializers.FloatField(read_only=True)
+    in_stock = serializers.BooleanField(read_only=True)
+    review_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = [
+            'id', 'name', 'description', 'price', 'stock', 'image',
+            'category', 'category_id', 'material', 'color', 'dimensions',
+            'is_featured', 'average_rating', 'in_stock', 'reviews_count',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['created_at', 'updated_at']
+
+    def get_reviews_count(self, obj):
+        return obj.reviews.count()
+
+        
 class CustomerSerializer(serializers.ModelSerializer):
     orders_count = serializers.SerializerMethodField()
 
