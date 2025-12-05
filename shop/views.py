@@ -141,3 +141,35 @@ def register_user(request):
         }, status = status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def analytics_dashboard(request):
+    # Total Counts
+    total_products = Product.objects.count()
+    total_orders = Order.objects.count()
+    total_customers = Customer.objects.count()
+
+    # Total revenue
+    total_revenue = Order.objects.aggregate(
+        total = Sum('total_price')
+    )['total'] or 0
+
+    # Top 5 selling products
+    top_products = Product.objects.annotate(
+        total_sold = Sum('orderitem__quantity')
+    ).order_by('-total_sold')[:5]
+
+    # Recent orders
+    recent_orders = Order.objects.all()[:10]
+
+    data = {
+        'total_products': total_products,
+        'total_orders': total_orders,
+        'total_customers': total_customers,
+        'total_revenue': total_revenue,
+        'top_selling_products': ProductListSerializer(top_products, many=True).data,
+        'recent_orders': OrderSerializer(recent_orders, many=True).data
+    }
+    return Response(data)
+
