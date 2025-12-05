@@ -100,3 +100,44 @@ class OrderViewSet(viewsets.ModelSerializer):
         order.save()
         serializer = OrderSerializer(order)
         return Response(serializer.data)
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.select_related('product', 'customer').all()
+    serializers_class = ReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['product', 'customer', 'rating']
+    ordering_fields = ['created_at', 'rating']
+    ordering = ['-created_at']
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register_user(request):
+    serializer = UserRegistrationSerializer(data=request.data)
+
+    if serializer.is_valid():
+        user = serializer.save()
+
+        # Create associated customer
+        customer_data = request.data.get('customer', {})
+        customer = Customer.objects.create(
+            user=user,
+            full_name = customer_data.get('full_name', f"{user.first_name} {user.last_name}"),
+            email = user.email,
+            phone = customer_data.get('phone', ''),
+            address = customer_data.get('address', ''),
+            city = customer_data.get('city', ''),
+            country = customer_data.get('country', '')
+        )
+
+        return Response({
+            'message': 'User registered successfully',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email
+            },
+            'customer': CustomerSerializer(customer).data
+        }, status = status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
