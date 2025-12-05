@@ -72,3 +72,31 @@ class CustomerViewSet(viewsets.ModelSerializer):
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
+class OrderViewSet(viewsets.ModelSerializer):
+    queryset = Order.objects.select_related('customer').prefetch_related('items').all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['status', 'customer']
+    ordering_fields = ['created_at', 'total_price']
+    ordering = ['-created_at']
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return OrderCreateSerializer
+        return OrderSerializer
+
+    @action(detail=True, methods=['patch'])
+    def update_status(self, request, pk=None):
+        order = self.get_object()
+        new_status = request.data.get('status')
+
+        if new_status not in dict(Order.STATUS_CHOICES):
+            return Response(
+                {'error': 'Invalid status'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        order.status = new_status
+        order.save()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
