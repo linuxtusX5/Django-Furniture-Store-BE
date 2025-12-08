@@ -14,3 +14,26 @@ class CategoryAdmin(admin.ModelAdmin):
     products_count.short_description = 'Products'
 
 
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = [
+        'name', 'category', 'price', 'stock',
+        'material', 'color', 'is_featured', 'created_at'
+    ]
+    list_filter = ['category', 'is_featured', 'material', 'color', 'created_at']
+    search_fields = ['name', 'description', 'material', 'color']
+    list_editable = ['price', 'stock', 'is_featured']
+    ordering = ['-created_at']
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'description', 'category', 'image')
+        }),
+        ('Pricing & Stock', {
+            'fields': ('price', 'stock', 'is_featured')
+        }),
+        ('Specifications', {
+            'fields': ('material', 'color', 'demensions')
+        })
+    )
+
