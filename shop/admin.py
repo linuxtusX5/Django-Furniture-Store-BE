@@ -37,3 +37,10 @@ class ProductAdmin(admin.ModelAdmin):
         })
     )
 
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ['full_name', 'email', 'phone', 'city', 'country', 'created_at']
+    search_fields = ['full_name', 'email', 'phone', 'city', 'country']
+    list_filter = ['country', 'city', 'created_at']
+    ordering = ['-created_at']
+
