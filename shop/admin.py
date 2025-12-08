@@ -49,3 +49,34 @@ class OrderItemInline(admin.TabularInline):
     extra = 1
     readonly_fields = ['subtotal']
     fields = ['product','quantity', 'subtotal']
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = [
+        'id', 'customer', 'total_price', 'status',
+        'items_count', 'created_at'
+    ]
+    list_filter = ['status', 'created_at']
+    search_fields = ['customer__full_name', 'customer__email']
+    list_editable = ['status']
+    ordering = ['-created_at']
+    inlines = [OrderItemInline]
+
+    fieldsets = (
+        ('Order Information', {
+            'fields': ('customer', 'total_price', 'status')
+        }),
+        ('Additional Details', {
+            'fields': ('notes',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    readonly_fields = ['created_at', 'updated_at']
+
+    def items_count(self, obj):
+        return obj.items.count()
+    items_count.short_description = 'Items'
