@@ -80,3 +80,13 @@ class OrderAdmin(admin.ModelAdmin):
     def items_count(self, obj):
         return obj.items.count()
     items_count.short_description = 'Items'
+
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ['order', 'product', 'quantity', 'subtotal']
+    list_filter = ['order__status', 'order__created_at']
+    search_fields = ['product__name', 'order__customer__full_name']
+    readonly_fields = ['subtotal']
+
+
