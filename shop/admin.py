@@ -90,3 +90,20 @@ class OrderItemAdmin(admin.ModelAdmin):
     readonly_fields = ['subtotal']
 
 
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ['product', 'customer', 'rating', 'created_at']
+    list_filter = ['rating', 'created_at']
+    search_fields = ['product__name', 'customer__full_name', 'comment']
+    ordering = ['-created_at']
+
+    fieldsets =(
+        ('Review Information', {
+            'fields': ('product', 'customer', 'rating', 'comment')
+        }),
+        ('Timestamp', {
+        'fields': ('created_at', ),
+        'classes': ('collapse', )
+        }),
+    )
+    readonly_fields = ['created_at']
