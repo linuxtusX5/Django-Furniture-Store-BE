@@ -173,3 +173,45 @@ def analytics_dashboard(request):
     }
     return Response(data)
 
+
+@api_view(['GET'])
+def api_overview(request):
+    """API overview and available endpoints"""
+    routes = {
+        'API Overview': '/api/',
+        'Authentication': {
+            'Register': '/api/auth/register/',
+            'Login (JWT)': '/api/auth/token/',
+            'Refresh token': '/api/auth/token/refresh/',
+        },
+        'Categories': {
+            'List/Create': '/api/categories/',
+            'Detail': '/api/categories/{id}/'
+        },
+        'Products': {
+            'list/Create': '/api/products/',
+            'Details': '/api/products/{id}/',
+            "Featured": '/api/products/featured/',
+            'Product Reviews': '/api/products/{id}/reviews/',
+        },
+        'Customers'; {
+            'List/Create': '/api/customers/',
+            'Detail': '/api/customers/{id}/',
+            'Customer Orders': '/api/customers/{id}/orders/',
+        },
+        'Orders': {
+            'List/Create': '/api/orders/',
+            'Detail': '/api/orders/{id}/',
+            'Update Status': '/api/orders/{id}/update_status/',
+        },
+        'Reviews': {
+            'List/Create': '/api/reviews/',
+            'Detail': '/api/reviews/{id}/',
+        },
+        'Analytics': '/api/analytics/',
+        'Documentation': {
+            'Swagger': '/api/docs/',
+            'ReDoc': '/api/redoc/',
+        }
+    }
+    return Response(routes)
