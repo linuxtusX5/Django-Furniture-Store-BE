@@ -44,3 +44,8 @@ class CustomerAdmin(admin.ModelAdmin):
     list_filter = ['country', 'city', 'created_at']
     ordering = ['-created_at']
 
+class OrderItemInline(admin.ModelAdmin):
+    model = OrderItem
+    extra = 1
+    readonly_fields = ['subtotal']
+    fields = ['product','quantity', 'subtotal']
