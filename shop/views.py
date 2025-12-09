@@ -17,15 +17,15 @@ from .serializers import (
 from .filters import ProductFilter
 
 # Create your views here.
-class CategoryViewSet(viewsets, ModelViewSet):
+class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
-    serializers_class = CategorySerializer
+    serializer_class = CategorySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
-    filter_backends = [filters.SerializerFilter, filters.OrderingFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'description']
     ordering_fields = ['name', 'created_at']
 
-class ProductViewSet(viewsets, ModelViewSet):
+class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.select_related('category').all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -57,9 +57,9 @@ class ProductViewSet(viewsets, ModelViewSet):
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data)
 
-class CustomerViewSet(viewsets.ModelSerializer):
+class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
-    serializers_class = CustomerSerializer
+    serializer_class = CustomerSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['full_name', 'email', 'phone', 'city', 'country']
@@ -72,7 +72,7 @@ class CustomerViewSet(viewsets.ModelSerializer):
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
-class OrderViewSet(viewsets.ModelSerializer):
+class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.select_related('customer').prefetch_related('items').all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
@@ -103,7 +103,7 @@ class OrderViewSet(viewsets.ModelSerializer):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.select_related('product', 'customer').all()
-    serializers_class = ReviewSerializer
+    serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['product', 'customer', 'rating']
@@ -194,7 +194,7 @@ def api_overview(request):
             "Featured": '/api/products/featured/',
             'Product Reviews': '/api/products/{id}/reviews/',
         },
-        'Customers'; {
+        'Customers': {
             'List/Create': '/api/customers/',
             'Detail': '/api/customers/{id}/',
             'Customer Orders': '/api/customers/{id}/orders/',
