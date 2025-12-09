@@ -33,7 +33,7 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('price', 'stock', 'is_featured')
         }),
         ('Specifications', {
-            'fields': ('material', 'color', 'demensions')
+            'fields': ('material', 'color', 'dimensions')
         })
     )
 
@@ -78,7 +78,10 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
 
     def items_count(self, obj):
-        return obj.items.count()
+        try:
+            return obj.items.count()
+        except Exception:
+            return 0
     items_count.short_description = 'Items'
 
 

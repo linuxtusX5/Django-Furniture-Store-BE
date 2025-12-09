@@ -33,7 +33,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     category_id = serializers.IntegerField(write_only=True)
     average_rating = serializers.FloatField(read_only=True)
     in_stock = serializers.BooleanField(read_only=True)
-    review_count = serializers.SerializerMethodField()
+    reviews_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
